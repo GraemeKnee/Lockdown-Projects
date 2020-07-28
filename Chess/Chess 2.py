@@ -195,6 +195,16 @@ class king(piece):
                         if (q.x,q.y) == z:
                             self.moves.remove(z)
 
+def inital_board():
+    pawns = [pawn(x,1+c*5,c) for c in range(2) for x in range(8)]
+    rooks = [rook(x*7,7*c,c) for c in range(2) for x in range(2)]
+    knights = [knight(1+x*5,7*c,c) for c in range(2) for x in range(2)]
+    bishops = [bishop(2+x*3,7*c,c) for c in range(2) for x in range(2)]
+    queens = [queen(4,7*c,c) for c in range(2)]
+    kings = [king(3,7*c,c) for c in range(2)]
+
+    return [pawns+rooks+knights+bishops+queens+kings,0,-1,[]]
+
 
 
 
@@ -211,23 +221,12 @@ run = True
 clock = py.time.Clock()
 FPS = 10
 
-pawns = [pawn(x,1+c*5,c) for c in range(2) for x in range(8)]
-rooks = [rook(x*7,7*c,c) for c in range(2) for x in range(2)]
-knights = [knight(1+x*5,7*c,c) for c in range(2) for x in range(2)]
-bishops = [bishop(2+x*3,7*c,c) for c in range(2) for x in range(2)]
-queens = [queen(4,7*c,c) for c in range(2)]
-kings = [king(3,7*c,c) for c in range(2)]
 
-
-pieces = pawns+rooks+knights+bishops+queens+kings
+[pieces,player,HiLi,options] = inital_board()
 
 for q in pieces:
     q.update_moves()
 
-HiLi = -1
-options = []
-
-player = 0
 
 
 while run:
@@ -265,6 +264,12 @@ while run:
             else:
                 HiLi = -1
                 options = []
+        elif event.type == py.KEYDOWN:
+            if event.key == py.K_r:
+                #reset board
+                [pieces,player,HiLi,options] = inital_board()
+
+
 
 
     #Draw
