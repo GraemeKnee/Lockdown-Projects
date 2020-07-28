@@ -1,4 +1,5 @@
 import pygame as py
+import os
 
 #global piece list
 pieces = []
@@ -11,6 +12,8 @@ class piece:
         self.col = c
         self.moves = []
         self.update_moves()
+        self.abs_path = os.path.dirname(__file__)
+        self.sprite = py.image.load(os.path.join(self.abs_path,self.rel_path))
 
     def move(self,x,y):
         global pieces
@@ -24,11 +27,12 @@ class piece:
 
 class pawn(piece):
     def __init__(self,x=0,y=0,c=0):
-        super().__init__(x,y,c)
-        if self.col == 0:
-            self.sprite = py.image.load("/home/graeme/Documents/Coding/Atom/Chess/sprite/white_pawn.png")
+        if c == 0:
+            self.rel_path = os.path.join("sprite","white_pawn.png")
         else:
-            self.sprite = py.image.load("/home/graeme/Documents/Coding/Atom/Chess/sprite/black_pawn.png")
+            self.rel_path = os.path.join("sprite","black_pawn.png")
+        super().__init__(x,y,c)
+
 
     #pawns need own move function to allow for promotion
     def move(self,x,y):
@@ -63,12 +67,11 @@ class pawn(piece):
 
 class knight(piece):
     def __init__(self,x=0,y=0,c=0):
-        super().__init__(x,y,c)
-        if self.col == 0:
-            self.sprite = py.image.load("/home/graeme/Documents/Coding/Atom/Chess/sprite/white_knight.png")
+        if c == 0:
+            self.rel_path = os.path.join("sprite","white_knight.png")
         else:
-            self.sprite = py.image.load("/home/graeme/Documents/Coding/Atom/Chess/sprite/black_knight.png")
-
+            self.rel_path = os.path.join("sprite","black_knight.png")
+        super().__init__(x,y,c)
     def update_moves(self):
         self.moves = [(self.x-2,self.y+1),(self.x-1,self.y+2),(self.x+1,self.y+2),(self.x+2,self.y+1),(self.x+2,self.y-1),(self.x+1,self.y-2),(self.x-1,self.y-2),(self.x-2,self.y-1)]
 
@@ -81,11 +84,11 @@ class knight(piece):
 
 class bishop(piece):
     def __init__(self,x=0,y=0,c=0):
-        super().__init__(x,y,c)
-        if self.col == 0:
-            self.sprite = py.image.load("/home/graeme/Documents/Coding/Atom/Chess/sprite/white_bishop.png")
+        if c == 0:
+            self.rel_path = os.path.join("sprite","white_bishop.png")
         else:
-            self.sprite = py.image.load("/home/graeme/Documents/Coding/Atom/Chess/sprite/black_bishop.png")
+            self.rel_path = os.path.join("sprite","black_bishop.png")
+        super().__init__(x,y,c)
 
     def update_moves(self):
         global pieces
@@ -113,11 +116,11 @@ class bishop(piece):
 
 class rook(piece):
     def __init__(self,x=0,y=0,c=0):
-        super().__init__(x,y,c)
-        if self.col == 0:
-            self.sprite = py.image.load("/home/graeme/Documents/Coding/Atom/Chess/sprite/white_rook.png")
+        if c == 0:
+            self.rel_path = os.path.join("sprite","white_rook.png")
         else:
-            self.sprite = py.image.load("/home/graeme/Documents/Coding/Atom/Chess/sprite/black_rook.png")
+            self.rel_path = os.path.join("sprite","black_rook.png")
+        super().__init__(x,y,c)
 
     def update_moves(self):
         global pieces
@@ -144,11 +147,11 @@ class rook(piece):
 
 class queen(piece):
     def __init__(self,x=0,y=0,c=0):
-        super().__init__(x,y,c)
-        if self.col == 0:
-            self.sprite = py.image.load("/home/graeme/Documents/Coding/Atom/Chess/sprite/white_queen.png")
+        if c == 0:
+            self.rel_path = os.path.join("sprite","white_queen.png")
         else:
-            self.sprite = py.image.load("/home/graeme/Documents/Coding/Atom/Chess/sprite/black_queen.png")
+            self.rel_path = os.path.join("sprite","black_queen.png")
+        super().__init__(x,y,c)
 
     def update_moves(self):
         global pieces
@@ -175,12 +178,11 @@ class queen(piece):
 
 class king(piece):
     def __init__(self,x=0,y=0,c=0):
-        super().__init__(x,y,c)
-        if self.col == 0:
-            self.sprite = py.image.load("/home/graeme/Documents/Coding/Atom/Chess/sprite/white_king.png")
+        if c == 0:
+            self.rel_path = os.path.join("sprite","white_king.png")
         else:
-            self.sprite = py.image.load("/home/graeme/Documents/Coding/Atom/Chess/sprite/black_king.png")
-
+            self.rel_path = os.path.join("sprite","black_king.png")
+        super().__init__(x,y,c)
     def update_moves(self):
         global pieces
         self.moves = [(self.x+o_x,self.y+o_y) for o_x in [-1,0,1] for o_y in [-1,0,1]]
