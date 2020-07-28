@@ -2,7 +2,9 @@
 
 Python Projects worked on during COVID-19 Lockdown.
 
-Python Modules used: pygame, random, math, numpy, copy
+Python Modules used: pygame, random, math, numpy, copy, os
+
+Sprite folder must be in same directory as chess.py
 
 Controls:
   Sudoku: "r": generate new grid
