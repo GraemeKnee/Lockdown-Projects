@@ -14,3 +14,14 @@ Controls:
           
   Snake: wasd: control snake
           "r": reset when dead
+
+  Chess: click: select piece/move piece. Click on invalid space to deselect
+           "r": reset
+          
+Future Features:
+Sudoku:
+        add small number possibilities to squares
+        
+Chess:
+        system to check for checks and mates and prevent king from moving into check
+        en passant rule for pawns
