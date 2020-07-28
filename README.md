@@ -1,4 +1,4 @@
-# Lockdown-Projects
+# Sample-Projects
 
 Python Projects worked on during COVID-19 Lockdown.
 
@@ -25,3 +25,6 @@ Sudoku:
 Chess:
         system to check for checks and mates and prevent king from moving into check
         en passant rule for pawns
+
+Contact email:
+graemeknee@gmail.com
