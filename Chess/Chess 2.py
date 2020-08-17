@@ -11,7 +11,7 @@ class piece:
         self.y = y
         self.col = c
         self.moves = []
-        self.update_moves()
+        self.update_moves(True)
         self.abs_path = os.path.dirname(__file__)
         self.sprite = py.image.load(os.path.join(self.abs_path,self.rel_path))
 
@@ -22,7 +22,7 @@ class piece:
                 pieces.remove(q)
         self.x = x
         self.y = y
-        self.update_moves()
+        self.update_moves(True)
 
 
 class pawn(piece):
@@ -45,25 +45,32 @@ class pawn(piece):
             pieces.append(queen(x,y,self.col))
         self.x = x
         self.y = y
-        self.update_moves()
 
-    def update_moves(self):
+    def update_moves(self,first):
         global pieces
         if self.col == 0:
             (start,end,dir) = 1,7,1
         else:
             (start,end,dir) = 6,0,-1
         self.moves = [(self.x,self.y+dir)]
-        if self.y !=end:
-            for q in pieces:
-                if (q.x,q.y) == (self.x,self.y+dir):
-                    self.moves.remove((self.x,self.y+dir))
-                elif (q.x,q.y) == (self.x+1,self.y+dir):
-                    self.moves.append((self.x+1,self.y+dir))
-                elif (q.x,q.y) == (self.x-1,self.y+dir):
-                    self.moves.append((self.x-1,self.y+dir))
-            if (self.x,self.y+dir) in self.moves and self.y == start:
-                self.moves.append((self.x,self.y+2*dir))
+        if self.y == start:
+            self.moves.append((self.x,self.y+2*dir))
+        for q in pieces:
+            if (q.x,q.y) == (self.x,self.y+dir):
+                self.moves.remove((self.x,self.y+dir))
+                if (q.x,q.y) == (self.x,self.y+2*dir) and (self.x,self.y+2*dir) in self.moves:
+                    self.moves.remove((self.x,self.y+2*dir))
+            elif (q.x,q.y) == (self.x+1,self.y+dir):
+                self.moves.append((self.x+1,self.y+dir))
+            elif (q.x,q.y) == (self.x-1,self.y+dir):
+                self.moves.append((self.x-1,self.y+dir))
+
+
+        if first:
+            for z in self.moves:
+                if check_move(self,z[0],z[1]):
+                    self.moves.remove(z)
+
 
 class knight(piece):
     def __init__(self,x=0,y=0,c=0):
@@ -72,13 +79,17 @@ class knight(piece):
         else:
             self.rel_path = os.path.join("sprite","black_knight.png")
         super().__init__(x,y,c)
-    def update_moves(self):
+    def update_moves(self,first):
         self.moves = [(self.x-2,self.y+1),(self.x-1,self.y+2),(self.x+1,self.y+2),(self.x+2,self.y+1),(self.x+2,self.y-1),(self.x+1,self.y-2),(self.x-1,self.y-2),(self.x-2,self.y-1)]
 
         #remove if off the grid
         for q in self.moves[::-1]:
             if not (0<= q[0] < 8 and 0<= q[1] < 8):
                 self.moves.remove(q)
+            elif first:
+                if check_move(self,q[0],q[1]):
+                    self.moves.remove(q)
+
 
 
 
@@ -90,7 +101,7 @@ class bishop(piece):
             self.rel_path = os.path.join("sprite","black_bishop.png")
         super().__init__(x,y,c)
 
-    def update_moves(self):
+    def update_moves(self,first):
         global pieces
         self.moves = []
 
@@ -112,7 +123,11 @@ class bishop(piece):
                 if end:
                     break
                 else:
-                    self.moves.append(m)
+                    if first:
+                        if not check_move(self,m[0],m[1]):
+                            self.moves.append(m)
+                    else:
+                        self.moves.append(m)
 
 class rook(piece):
     def __init__(self,x=0,y=0,c=0):
@@ -122,7 +137,7 @@ class rook(piece):
             self.rel_path = os.path.join("sprite","black_rook.png")
         super().__init__(x,y,c)
 
-    def update_moves(self):
+    def update_moves(self,first):
         global pieces
         self.moves = []
         #generate all possible moves, 4 directions, no restrictions
@@ -143,7 +158,11 @@ class rook(piece):
                 if end:
                     break
                 else:
-                    self.moves.append(m)
+                    if first:
+                        if not check_move(self,m[0],m[1]):
+                            self.moves.append(m)
+                    else:
+                        self.moves.append(m)
 
 class queen(piece):
     def __init__(self,x=0,y=0,c=0):
@@ -153,7 +172,7 @@ class queen(piece):
             self.rel_path = os.path.join("sprite","black_queen.png")
         super().__init__(x,y,c)
 
-    def update_moves(self):
+    def update_moves(self,first):
         global pieces
         self.moves = []
         #generate all possible moves, 8 directions, no restrictions
@@ -174,7 +193,11 @@ class queen(piece):
                 if end:
                     break
                 else:
-                    self.moves.append(m)
+                    if first:
+                        if not check_move(self,m[0],m[1]):
+                            self.moves.append(m)
+                    else:
+                        self.moves.append(m)
 
 class king(piece):
     def __init__(self,x=0,y=0,c=0):
@@ -183,19 +206,27 @@ class king(piece):
         else:
             self.rel_path = os.path.join("sprite","black_king.png")
         super().__init__(x,y,c)
-    def update_moves(self):
+    def update_moves(self,first):
         global pieces
         self.moves = [(self.x+o_x,self.y+o_y) for o_x in [-1,0,1] for o_y in [-1,0,1]]
 
         #remove if off the grid or ally piece or threatened by other
         for z in self.moves[::-1]:
+            remove = False
             if not (0<= z[0] < 8 and 0<= z[1] < 8) :
                 self.moves.remove(z)
+                remove = True
             else:
                 for q in pieces:
                     if q.col == self.col:
                         if (q.x,q.y) == z:
                             self.moves.remove(z)
+                            remove = True
+            if not remove and first:
+                if check_move(self,z[0],z[1]):
+                    self.moves.remove(z)
+
+
 
 def inital_board():
     pawns = [pawn(x,1+c*5,c) for c in range(2) for x in range(8)]
@@ -208,6 +239,44 @@ def inital_board():
     return [pawns+rooks+knights+bishops+queens+kings,0,-1,[]]
 
 
+def check_check(colour):
+    global pieces
+    opp_moves = []
+    k_pos = ()
+    for q in pieces:
+        if q.col != colour:
+            opp_moves += q.moves
+        elif isinstance(q,king):
+            k_pos = (q.x,q.y)
+    if k_pos in opp_moves:
+        return True
+    else:
+        return False
+
+def check_move(k, x,y):
+    global pieces
+    s_x = k.x
+    s_y = k.y
+    ind = -1
+    for i in range(len(pieces))[::-1]:
+        q = pieces[i]
+        if (q.x,q.y) == (x,y):
+            q.x =  -1
+            q.y = -1
+            ind = i
+    k.x = x
+    k.y = y
+    for q in pieces:
+        if q.col != k.col:
+            q.update_moves(False)
+    valid = check_check(k.col)
+    k.x=s_x
+    k.y=s_y
+    if ind != -1:
+        pieces[ind].x = x
+        pieces[ind].y = y
+
+    return valid
 
 
 win_x = 1000
@@ -227,7 +296,7 @@ FPS = 10
 [pieces,player,HiLi,options] = inital_board()
 
 for q in pieces:
-    q.update_moves()
+    q.update_moves(True)
 
 
 
@@ -249,7 +318,7 @@ while run:
                         q = pieces[i]
                         if q.x == M_x and q.y == M_y and q.col == player:
                             HiLi = i
-                            pieces[i].update_moves()
+                            pieces[i].update_moves(True)
                             options = pieces[i].moves
                 elif (M_x,M_y) in options:
                     pieces[HiLi].move(M_x,M_y)
@@ -286,13 +355,17 @@ while run:
                 py.draw.rect(win,(100,100,100),(100+100*x,100+100*y,100,100))
     #Highlight
     if HiLi != -1:
-        py.draw.rect(win,(200,100,100),(100+100*pieces[HiLi].x,100+100*pieces[HiLi].y,100,100))
+        py.draw.rect(win,(100,200,100),(100+100*pieces[HiLi].x,100+100*pieces[HiLi].y,100,100))
     #Move options
     for q in options:
         py.draw.rect(win,(100,100,200),(105+100*q[0],105+100*q[1],90,90))
 
     #Pieces
     for q in pieces:
+        if isinstance(q,king):
+            if check_check(q.col):
+                py.draw.rect(win,(200,100,100),(105+100*q.x,105+100*q.y,90,90))
         win.blit(q.sprite,(100+100*q.x,100+100*q.y))
+
 
     py.display.update()
